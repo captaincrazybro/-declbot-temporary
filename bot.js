@@ -140,6 +140,11 @@ bot.on("ready", async () => {
 
 });
 
+// make it stay with decl 
+bot.on("guildCreate", guild => {
+  _League.setLeague(guild.id, "decl");
+})
+
 function showLeague(i) {
   i++;
   if (leagues.length == i) i = 0;
