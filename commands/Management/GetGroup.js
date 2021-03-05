@@ -35,10 +35,10 @@ module.exports.run = async (bot,message,args,cmd) => {
     var name;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
     }
 
@@ -73,8 +73,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 }
 
 function userExists(id, league){
-    let users = _User.users(league);
-    return users[league].users[id];
+    return _User.exists(id, league);
 }
 
 module.exports.help = {

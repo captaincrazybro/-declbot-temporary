@@ -17,8 +17,8 @@ module.exports.run = async (bot, message, args, cmd) => {
 
 	let users = require("../../storage/permissions.json")
 
-	let usersObj = users[league].users;
-	let rolesObj = users[league].roles;
+	let usersObj = await _User.users(league);
+	let rolesObj = await _Role.roles(league);
 
 	let userMap = new Map(Object.entries(usersObj))
 

@@ -20,16 +20,19 @@ module.exports.run = async (bot, message, args, cmd) => {
 
     let promise = _MinecraftApi.getUuid(playerName)
 
-    promise.then(val => {
+    promise.then(async val => {
 
-        if (val == false || !_Player.getPlayer(playerName, league)) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
+        if(val == false)  return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-        let player = _Player.getPlayer(val.name, league);
+        let player = await _Player.getPlayer(val.id, league);
 
-        if (player == null) player = _Player.addPlayer(val.name, league);
+        if (!player) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-        player.remRank();
-        player.remRank2();
+        if (player == null) player = await _Player.addPlayer(val.id, league);
+
+        player.rank1 = "Member";
+        player.rank2 = undefined;
+        await player.update();
 
         new _NoticeEmbed(Colors.SUCCESS, `Successfully removed ${val.name}'s rank`).send(message.channel);
 

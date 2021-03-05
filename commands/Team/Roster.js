@@ -11,6 +11,22 @@ const _Player = require('../../util/Constructors/_Player');
 const _Blacklist = require('../../util/Constructors/_Blacklist');
 const _League = require('../../util/Constructors/_League.js');
 const _MinecaftAPI = require("../../util/Constructors/_MinecraftAPI")
+const util = require('util')
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: "decl"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
+con.query = util.promisify(con.query);
 
 module.exports.run = async (bot, message, args, cmd) => {
 
@@ -27,14 +43,14 @@ module.exports.run = async (bot, message, args, cmd) => {
 
     if (league == null) return new _NoticeEmbed(Colors.ERROR, "Invalid league - Please specify a valid league").send(message.channel);
 
-    let team = getTeam(teamName, league);
+    let team = await getTeam(teamName, league);
 
     if (team == null) return new _NoticeEmbed(Colors.ERROR, "Invalid name - This team does not exist").send(message.channel);
 
     var membersArray = [];
 
     //_Player.updateNames()
-    let players = team.getMembers();
+    let players = await team.getMembers();
     let time = new Date();
     let i = 0, playerNames = [];
     while (i < players.length) {
@@ -45,7 +61,7 @@ module.exports.run = async (bot, message, args, cmd) => {
         val.name = playerNames[val.uuid]
         // console.log("val val ", val.name)
         var member = "";
-        if (getRankOrNull(val.rank) != null) member += `${getRankOrNull(val.rank)} `
+        if (getRankOrNull(val.rank1) != null) member += `${getRankOrNull(val.rank1)} `
         member += `${val.name.replace(/_/g, "\\_")}`
         if (val.rank2 != undefined) if (val.rank2.toLowerCase() != "none" && getRankOrNull(val.rank2) != null) member += ` ${getRankOrNull(val.rank2)}`
         if (_Blacklist.getBlacklist(val.uuid, league)) {
@@ -73,7 +89,7 @@ module.exports.run = async (bot, message, args, cmd) => {
         if (val == null) owner = "None";
         else owner = val;
 
-        var teams = require('../../storage/teams.json');
+       /*var teams = require('../../storage/teams.json');
         var teamsSorted = teams[league];
         if (league == "ctfc") {
             teamsSorted.sort((a, b) => { return (parseInt(`${b.losses}.${b.wins}`) - parseInt(`${a.losses}.${a.wins}`)) })
@@ -83,7 +99,7 @@ module.exports.run = async (bot, message, args, cmd) => {
         var index;
         teamsSorted.forEach((val, i) => {
             if (val.name == team.name) index = i
-        })
+        })*/
 
         let embed = new Discord.MessageEmbed()
             .setColor(team.color)
@@ -94,7 +110,7 @@ module.exports.run = async (bot, message, args, cmd) => {
             embed.addField("Tier", team.wins);
             embed.addField("Rank", team.losses);
         } else if (league == "decl") {
-            embed.addField("Points", team.wins)
+            embed.addField("Points", team.points)
         } else if (league == "twl") {
             embed.addField("Wins", team.wins);
             embed.addField("Losses", team.losses);
@@ -102,7 +118,7 @@ module.exports.run = async (bot, message, args, cmd) => {
         embed.addField("League", league.toUpperCase())
         embed.addField("Members", members)
 
-        if (team.logo != "None") embed.setThumbnail(team.logo);
+        if (team.logo.toLowerCase() != "none") embed.setThumbnail(team.logo);
 
         message.channel.send(embed);
 
@@ -112,15 +128,13 @@ module.exports.run = async (bot, message, args, cmd) => {
 
 }
 
-function getTeam(team, league) {
+async function getTeam(team, league) {
 
-    var outcome = null;
+    let rows = await con.query(`SELECT * FROM teams WHERE name LIKE "%${team}%" AND league = "${league}"`)
 
+    if(rows.length == 0) return null;
 
-    teams[league].forEach(val => {
-        if (val.name.toLowerCase().includes(team.toLowerCase())) outcome = _Team.getTeam(val.name, league);
-    });
-    return outcome;
+    return await _Team.getTeam(rows[0].name, league);
 
 }
 

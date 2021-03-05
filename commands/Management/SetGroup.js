@@ -60,10 +60,10 @@ module.exports.run = async(bot,message,args,cmd) => {
     var name;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
     }
 
@@ -86,9 +86,7 @@ module.exports.run = async(bot,message,args,cmd) => {
 }
 
 function userExists(id, league){
-    let users = _User.users(league);
-    console.log(users);
-    return users.users[id];
+    return await _User.exists(id, league);
 }
 
 module.exports.help = {

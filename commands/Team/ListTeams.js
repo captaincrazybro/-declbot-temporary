@@ -16,7 +16,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     if(league == null) return new _NoticeEmbed(Colors.ERROR, "Invalid league - Please specify a valid league").send(message.channel);
 
-    let teams = _Team.getTeams(league);
+    let teams = await _Team.getTeams(league);
 
     if(league == "cotc"){
         teams = teams.sort(function(a, b){
@@ -40,9 +40,12 @@ module.exports.run = async (bot,message,args,cmd) => {
         })
         embed.setDescription(description);
     } else {
-        teams.forEach(val => {
-            embed.addField(val.name, `${val.getMembers().length} Members`)
-        })
+        let i = 0;
+        while(i < teams.length){
+            let memberCount = (await teams[i].getMembers()).length;
+            embed.addField(teams[i].name, `${memberCount} Members`)
+            i++;
+        }
     }
 
     message.channel.send(embed);

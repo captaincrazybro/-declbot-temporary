@@ -34,14 +34,13 @@ module.exports.run = async (bot,message,args,cmd) => {
     var obj;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
-        obj = _User.users(league).users[memOrRole.id];
+        obj = type;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
-        let role = new _Role(memOrRole.id);
-        obj = _User.users(league).roles[memOrRole.id];
+        obj = type;
     }
 
     var outcome = "";

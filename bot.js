@@ -19,6 +19,22 @@ const Groups = require('./util/Enums/Groups');
 const _League = require('./util/Constructors/_League');
 const { MessageEmbed } = require('discord.js');
 const EmbedWizard = require('./modules/EmbedWizard.js');
+const util = require('util')
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: "decl"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
+con.query = util.promisify(con.query);
 
 require("dotenv").config();
 
@@ -113,6 +129,7 @@ fs.writeFile('./storage/permissions.json', JSON.stringify(permissions), (err) =>
 })
 
 bot.on("ready", async () => {
+
   console.log(`${bot.user.username} is online!`);
   //bot.user.setPresence({ game: { name: "Mineplex" } });
   bot.user.setPresence({
@@ -153,6 +170,11 @@ function showLeague(i) {
     showLeague(i);
   }, 10000)
 }
+
+// make it stay with decl 
+bot.on("guildCreate", guild => {
+  _League.setLeague(guild.id, "decl");
+})
 
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (this.rankedReactionsMap.has(reaction.message.id)) {
@@ -233,7 +255,6 @@ setInterval(function () {
     i++;
   }
 }, ms("12h"));
-//_Player.updateNames()
 
 /*add daily backups
 let players = require("../../storage/players.json");
@@ -646,7 +667,7 @@ function doMatchOutcome(message) {
 
 }
 
-function doBlAdd(message) {
+async function doBlAdd(message) {
 
   if (module.exports.blAddMap.has(message.author.id)) {
 
@@ -666,19 +687,20 @@ function doBlAdd(message) {
 
           if (val == false) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-          let player = _Player.getPlayer(message.content, module.exports.blAddMap.get(message.author.id).league);
-          if (!player) player = _Player.addPlayer(val.name, val.id, module.exports.blAddMap.get(message.author.id).league);
+          let name = message.content;
+          //let player = await _Player.getPlayer(message.content, module.exports.blAddMap.get(message.author.id).league);
+          //if (!player) player = await _Player.addPlayer(val.name, val.id, module.exports.blAddMap.get(message.author.id).league);
 
           //if(player.rank.toLowerCase() != "referee")
 
           let newObj = module.exports.blAddMap.get(message.author.id)
 
-          newObj.referee = player.name;
+          newObj.referee = name
           newObj.step = 1;
 
           module.exports.blAddMap.set(message.author.id, newObj);
 
-          return new _NoticeEmbed(Colors.SUCCESS, "The referee for this blacklist has been set to " + player.name + ". Please enter the start date of the blacklist (MM/DD/YYYY).").send(message.channel);
+          return new _NoticeEmbed(Colors.SUCCESS, "The referee for this blacklist has been set to " + name + ". Please enter the start date of the blacklist (MM/DD/YYYY).").send(message.channel);
 
         })
       }
@@ -786,12 +808,14 @@ function doBlAdd(message) {
         newObj.step = 6;
 
         if (newObj.isGlobal) {
-          leagues.forEach(val => {
-            _Blacklist.createBlacklist(newObj, val);
-          })
+          
+          for(let i = 0; i < leagues.length; i++){
+            let val = leagues[i];
+            await _Blacklist.createBlacklist(newObj, val);
+          }
         }
         else {
-          _Blacklist.createBlacklist(newObj, newObj.league);
+          await _Blacklist.createBlacklist(newObj, newObj.league);
         }
 
         module.exports.blAddMap.set(message.author.id, newObj);

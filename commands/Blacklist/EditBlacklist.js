@@ -19,21 +19,21 @@ module.exports.run = async (bot, message, args, cmd) => {
 
     let name = args[0];
 
-    _MinecraftApi.getUuid(name).then(val => {
+    _MinecraftApi.getUuid(name).then(async val => {
 
         if (val == false || val == undefined) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-        let player = _Player.getPlayer(val.name, league);
+        let player = await _Player.getPlayer(val.id, league);
 
-        if (player == null) player = _Player.addPlayer(val.name, league);
+        if (player == null) player = await _Player.addPlayer(val.id, league);
 
-        let blacklist = _Blacklist.getBlacklist(val.id, league);
+        let blacklist = await _Blacklist.getBlacklist(val.id, league);
 
         if (args.length == 1) return new _NoticeEmbed(Colors.WARN, "Please specify a field").send(message.channel)
 
         let field = args[1].toLowerCase();
 
-        if (!blacklist[field] || field == "name" || field == "uuid") return new _NoticeEmbed(Colors.ERROR, "Invalid field - Please specify an existing blacklist field").send(message.channel);
+        if (blacklist[field] == null || !blacklist[field] || field == "name" || field == "uuid") return new _NoticeEmbed(Colors.ERROR, "Invalid field - Please specify an existing blacklist field").send(message.channel);
 
         if (args.length == 2) return new _NoticeEmbed(Colors.WARN, "Please specify a value").send(message.channel);
 
@@ -47,7 +47,7 @@ module.exports.run = async (bot, message, args, cmd) => {
 
         blacklist[field] = value;
 
-        blacklist.update();
+        await blacklist.update();
 
         return new _NoticeEmbed(Colors.SUCCESS, "Successfully edited the blacklist " + val.name + ", settings the field " + field + " to " + value).send(message.channel);
 

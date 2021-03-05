@@ -17,7 +17,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
         let teamName = args[0];
 
-        let team = _Team.getTeam(teamName, league);
+        let team = await _Team.getTeam(teamName, league);
 
         if(team == null) return new _NoticeEmbed(Colors.ERROR, "Invalid name - This team does not exist").send(message.channel);
 
@@ -33,7 +33,8 @@ module.exports.run = async (bot,message,args,cmd) => {
 
         let losses = parseInt(args[2]);*/
 
-        team.addWins(points);
+        team.points += points;
+        await team.update();
 
         new _NoticeEmbed(Colors.SUCCESS, `Successfully added ${points} points to ${team.name}`).send(message.channel);
 

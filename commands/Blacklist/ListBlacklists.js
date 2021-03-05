@@ -15,7 +15,7 @@ module.exports.run = async (bot, message, args, cmd) => {
     if (_League.getLeague(message.guild.id) == null) return new _NoticeEmbed(Colors.ERROR, "This guild does not have a league set! Use the " + settings.prefix + "setleague command to set the guild's league").send(message.channel);
 
     let league = _League.getLeague(message.guild.id)
-    blacklist = _Blacklist.blacklists(league);
+    blacklist = await _Blacklist.getBlacklists(league);
 
     let list = "";
     console.log(blacklist)
@@ -29,20 +29,21 @@ module.exports.run = async (bot, message, args, cmd) => {
         if (a.name && b.name && a.name.toLowerCase() > b.name.toLowerCase()) { return 1; }
         return 0;
     })
-    blacklist.forEach(val => {
-        console.log(val)
+    for(let i = 0; i < blacklist.length; i++){
+        let val = blacklist[i];
+        console.log(val[0])
         // val.name = playerNames[val.uuid]
         if (!val.uuid) return;
-        let player = _Player.getPlayerUuid(val.uuid, league);
+        let player = await _Player.getPlayer(val.uuid, league);
 
-        if (!player) player = _Player.addPlayer(val.name, val.uuid, league);
+        if (!player) player = await _Player.addPlayer(val.uuid, league);
         if (!player) {
             val.name = `<player ${player.uuid}>`
             console.log(player.uuid, "Please add a name to this player");
         }
         list += `${val.name.replace(/_/g, "\\_")}\n`;
         // - Referee: ${val.referee} - Date: ${val.start_date}
-    })
+    }
     let time2 = new Date();
     console.log("sort", new Date(time2 - time))
 
