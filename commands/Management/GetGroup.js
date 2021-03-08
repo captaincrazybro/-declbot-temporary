@@ -35,22 +35,22 @@ module.exports.run = async (bot,message,args,cmd) => {
     var name;
 
     if(typeName == "user"){
-        type = _User.getUser(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
     } else {
-        type = _Role.getRole(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
     }
 
     var group;
 
-    if(type.getGroup == 0){
+    if(type.group == 0){
         group = "Default";
-    } else if(type.getGroup == 1){
+    } else if(type.group == 1){
         group = "Mod";
-    } else if(type.getGroup == 2){
+    } else if(type.group == 2){
         group = "Admin";
-    } else if(type.getGroup == 3){
+    } else if(type.group == 3){
         group = "Manager";
     } else {
         group = "Owner"

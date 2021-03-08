@@ -34,18 +34,18 @@ module.exports.run = async (bot,message,args,cmd) => {
     var obj;
 
     if(typeName == "user"){
-        type = _User.getUser(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
         obj = type;
     } else {
-        type = _Role.getRole(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
         obj = type;
     }
 
     var outcome = "";
 
-    let map = new Map(Object.entries(obj.commands));
+    let map = new Map(Object.entries(JSON.parse(obj.commands)));
 
     map.forEach((v, k) => {
         outcome += `${k} - ${v}\n`

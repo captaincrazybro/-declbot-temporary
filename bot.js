@@ -248,13 +248,13 @@ bot.on("messageReactionAdd", async (reaction, user) => {
   }
 });
 
-setInterval(function () {
+/*setInterval(function () {
   let i = 0;
   while (i < leagues.length) {
     _Player.updateNames(leagues[i]);
     i++;
   }
-}, ms("12h"));
+}, ms("12h"));*/
 
 /*add daily backups
 let players = require("../../storage/players.json");

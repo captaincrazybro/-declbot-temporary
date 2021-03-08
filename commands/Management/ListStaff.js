@@ -15,8 +15,6 @@ module.exports.run = async (bot, message, args, cmd) => {
 
 	let league = _League.getLeague(message.guild.id);
 
-	let users = require("../../storage/permissions.json")
-
 	let usersObj = await _User.users(league);
 	let rolesObj = await _Role.roles(league);
 
@@ -29,16 +27,16 @@ module.exports.run = async (bot, message, args, cmd) => {
 	let newMap = [];
 	for (let k = Object.keys(Groups.parse).length - 1; k >= 0; k--) {
 		for (let i = 0; i < map.length; i++) {
-			if (map[i][1].group == k) {
+			if (map[i][1].thegroup == k) {
 				newMap.push(map[i]);
 			}
 		}
 	} 
 
-	(new Map(newMap)).forEach((k, v) => {
+	newMap.forEach((k) => {
 		if (k.group != 0) {
-			var group = Groups.parse[k.group];
-			members += `User - <@${v.toString()}> - ${group}\n`
+			var group = Groups.parse[k[1].thegroup];
+			members += `User - <@${k[1].id}> - ${group}\n`
 		}
 	});
 
@@ -46,8 +44,8 @@ module.exports.run = async (bot, message, args, cmd) => {
 		let roleMap = new Map(Object.entries(rolesObj))
 		roleMap.forEach((k, v) => {
 			if (k.group != 0) {
-				var group = Groups.parse[k.group];
-				members += `Role - <@${v}> - ${group}\n`
+				var group = Groups.parse[k[1].thegroup];
+				members += `Role - <@${k[1].id}> - ${group}\n`
 			}
 		})
 	}

@@ -17,7 +17,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 	
 	index.reload = isTrueSet;
 	
-	if(isTrueSet) bot.guilds.get('665698425601392749').channels.get('678679440993288263').send("Bot maintenance in progress")
+	//if(isTrueSet) bot.guilds.cache.get('665698425601392749').channels.cache.get('678679440993288263').send("Bot maintenance in progress")
 	
 	settings.maintenance = isTrueSet;
 	

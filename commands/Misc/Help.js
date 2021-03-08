@@ -35,9 +35,9 @@ module.exports.run = async (bot, message, args, cmd) => {
 
                 folderFiles.forEach(function (val, i, array) {
                     let props = require(`../${f2}/${val}`);
-                    if (user.hasPermission(props) || hasPermissionRoles(message, props)) {
+                    //if (user.hasPermission(props) || hasPermissionRoles(message, props)) {
                         commandsArray.push(props.help.name);
-                    }
+                    //}
                 })
 
                 let commands = commandsArray.join(", ");

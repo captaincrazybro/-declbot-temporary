@@ -75,7 +75,8 @@ module.exports.run = async(bot,message,args,cmd) => {
 
     if(typeName == "role") name = name.replace("@", "@&");
 
-    type.setGroup(group);
+    type.group = group; 
+    type.update();
 
     let embed = new Discord.MessageEmbed()
         .setColor(Colors.SUCCESS)
@@ -85,7 +86,7 @@ module.exports.run = async(bot,message,args,cmd) => {
 
 }
 
-function userExists(id, league){
+async function userExists(id, league){
     return await _User.exists(id, league);
 }
 

@@ -7,6 +7,7 @@ const _User = require('../../util/Constructors/_User')
 const _Role = require('../../util/Constructors/_Role.js')
 const Discord = require('discord.js');
 const _League = require('../../util/Constructors/_League');
+const { commands } = require('../../bot');
 
 module.exports.run = async(bot,message,args,cmd) => {
 
@@ -68,7 +69,11 @@ module.exports.run = async(bot,message,args,cmd) => {
 
     if(typeName == "role") name = name.replace("@", "@&");
 
-    type.setCommandPerm(props.help.name, boolean);
+    let commands = type.getCommands();
+    commands[props.help.name] = boolean;
+
+    type.commands = commands;
+    await type.update();
 
     let embed = new Discord.MessageEmbed()
         .setColor(Colors.SUCCESS)
