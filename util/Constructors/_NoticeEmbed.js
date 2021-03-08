@@ -1,4 +1,3 @@
-const users = require('../../storage/permissions.json');
 const Groups = require('../Enums/Groups.js');
 const fs = require('fs');
 const settings = require("../../settings.json");
