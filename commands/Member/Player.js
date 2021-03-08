@@ -36,10 +36,6 @@ module.exports.run = async (bot, message, args, cmd) => {
 
         //let blacklist = _Blacklist.getBlacklist(val.id);
 
-        if(player.discordId != null && player.discordId != 0) {
-            let discordUser = await bot.users.fetch(player.discordId)
-        }
-
         let theLeagues = getLeagues(player.name);
 
         let embed = new Discord.MessageEmbed()
@@ -48,7 +44,7 @@ module.exports.run = async (bot, message, args, cmd) => {
             .addField("Team", player.team)
             .addField("Rank", ranks)
             .addField("UUID", val.id)
-            if(player.discordId != null && player.discordId != 0) embed.addField("Discord", discordUser.tag)
+            if(player.discordId != null && player.discordId != 0) embed.addField("Discord", `<@${player.discordId}>`)
             //if(theLeagues.length != 0) embed.addField("Leagues", theLeagues.toString(", ").toUpperCase())
             //else embed.addField("Leagues", "None")
             embed.setThumbnail(`http://minotar.net/helm/${val.name}/64.png`)

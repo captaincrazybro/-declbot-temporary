@@ -39,8 +39,7 @@ module.exports = class _Player {
 
     async update(){
         // updates any changes made to the variables above
-        console.log(this.discordId);
-        await con.query(`UPDATE players SET team = "${this.team}", rank1 = "${this.rank1}", rank2 = "${this.rank2}", discordId = ${this.discordId} WHERE uuid = "${this.uuid}" AND league = "${this.league}"`)
+        await con.query(`UPDATE players SET team = "${this.team}", rank1 = "${this.rank1}", rank2 = "${this.rank2}", discordId = "${this.discordId}" WHERE uuid = "${this.uuid}" AND league = "${this.league}"`)
     }
 
     static async exists(uuid, league){
@@ -67,8 +66,8 @@ module.exports = class _Player {
     static async addPlayer(uuid, league){
         let exists = await this.exists(uuid, league);
         if(exists != null) return null; 
-        let result = await con.query(`INSERT INTO players (uuid, team, rank1, rank2, discordId, league) VALUES ("${uuid}", "None", "Member", "None", 0, "${league}")`);
-        return new _Player({uuid:uuid,team:"None",rank1:"Member",rank2:"None",discordId:0}, league);
+        let result = await con.query(`INSERT INTO players (uuid, team, rank1, rank2, discordId, league) VALUES ("${uuid}", "None", "Member", "None", "0", "${league}")`);
+        return new _Player({uuid:uuid,team:"None",rank1:"Member",rank2:"None",discordId:"0"}, league);
     }
 
     static async filterMembers(team, league){

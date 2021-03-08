@@ -5,7 +5,7 @@ const Colors = require('../../util/Enums/Colors')
 const Discord = require('discord.js');
 const _MinecraftApi = require('../../util/Constructors/_MinecraftAPI')
 const ranks = require('../../storage/ranks.json')
-const teams = require('../../storage/teams.json')
+//const teams = require('../../storage/teams.json')
 const _Player = require('../../util/Constructors/_Player');
 // const stringUtil = require('string-similarity');
 const _Blacklist = require('../../util/Constructors/_Blacklist');
@@ -64,10 +64,11 @@ module.exports.run = async (bot, message, args, cmd) => {
         if (getRankOrNull(val.rank1) != null) member += `${getRankOrNull(val.rank1)} `
         member += `${val.name.replace(/_/g, "\\_")}`
         if (val.rank2 != undefined) if (val.rank2.toLowerCase() != "none" && getRankOrNull(val.rank2) != null) member += ` ${getRankOrNull(val.rank2)}`
-        if (_Blacklist.getBlacklist(val.uuid, league)) {
+        let blacklist = await _Blacklist.getBlacklist(val.uuid, league)
+        if (blacklist) {
             member = `:x: ${val.name.replace(/_/g, "\\_")}`
         }
-        if (isAlt(val.name, league)) member = `:x: ${val.name.replace(/_/g, "\\_")}`
+        if (await isAlt(val.name, league)) member = `:x: ${val.name.replace(/_/g, "\\_")}`
         membersArray.push(member);
     }
     let time2 = new Date();
@@ -165,11 +166,11 @@ function getRankOrNull(rank) {
 
 }
 
-function isAlt(name, league) {
+async function isAlt(name, league) {
 
     let outcome = false;
 
-    _Blacklist.blacklists(league).forEach(bl => {
+    (await _Blacklist.getBlacklists(league)).forEach(bl => {
         let alts = bl.alts;
         if (arrayContains(alts.split(", "), name) || arrayContains(alts.split(","), name) || arrayContains(alts.split(" "), name) || alts.replace(" ").toLowerCase() == name.toLowerCase()) outcome = true;
     })

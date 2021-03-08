@@ -4,7 +4,7 @@ const Colors = require('../../util/Enums/Colors.js')
 const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed')
 const settings = require('../../settings.json');
 const fs = require('fs');
-const players = require('../../storage/players.json');
+//const players = require('../../storage/players.json');
 const index = require('../../bot.js')
 
 module.exports.run = async (bot,message,args,cmd) => {
