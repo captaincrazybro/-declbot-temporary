@@ -11,7 +11,7 @@ const _Player = require("./_Player");
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password",
+  password: "oukS$aA7o22#I8drlThK",
   database: "decl"
 });
 
