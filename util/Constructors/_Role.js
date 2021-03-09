@@ -58,7 +58,7 @@ module.exports = class _Role {
 
         let rows = await con.query(`SELECT * FROM permissions WHERE id = "${id}" AND type = "role" AND league = "${league}"`);
         if(rows.lenght == 0) {
-            await con.query(`INSERT INTO permissions (userId, type, thegroup, commands, league) VALUES ("${id}", "role", 0, '{}', "${league}")`);
+            await con.query(`INSERT INTO permissions (id, type, thegroup, commands, league) VALUES ("${id}", "role", 0, '{}', "${league}")`);
             group = 0;
             commands = {};
         } else {
