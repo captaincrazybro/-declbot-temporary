@@ -67,13 +67,13 @@ module.exports = class _User {
         }
 
         if(settings.owners.includes(id)){
+            if(group != 4) await con.query(`UPDATE permissions SET thegroup = 4 WHERE id = "${id}"`);
             group = 4;
-            if(rows[0].thegroup != 4) await con.query(`UPDATE permissions SET thegroup = 4 WHERE id = "${id}"`);
         }
 
         if(settings.managers.includes(id)){
+            if(group != 3) await con.query(`UPDATE permissions SET thegroup = 3 WHERE id = "${id}"`)
             group = 3;
-            if(rows[0].thegroup != 3) await con.query(`UPDATE permissions SET thegroup = 3 WHERE id = "${id}"`)
         }
 
         return new _User(id, group, commands, league);
