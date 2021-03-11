@@ -380,14 +380,20 @@ async function hasPermissionRoles(message, prop) {
 
   let member = message.guild.members.cache.get(message.author.id);
   let outcome = false;
-  member.roles.forEach((val, i, map) => {
+
+  let roles = member.roles;
+
+  let i = 0;
+  while(i < roles.length){
+    let val = roles[i];
     let role = _Role.getRole(val.id, league);
     let permission = await role.hasPermission(prop);
     if (permission) {
       outcome = true;
       return;
     }
-  })
+    i++;
+  }
   return outcome;
 }
 
