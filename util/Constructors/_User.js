@@ -33,14 +33,13 @@ module.exports = class _User {
 
     }
 
-    async getCommands(){
-        return JSON.parse(await this.commands);
+    getCommands(){
+        return JSON.parse(this.commands);
     }
 
-    async hasCommandPerm(commandName){
-        let commands = await this.getCommands();
-        if(commands[commandName] == undefined || commands[commandName] == null) return null;
-        return commands[commandName] != false;
+    hasCommandPerm(commandName){
+        if(this.getCommands()[commandName] == undefined || this.getCommands()[commandName] == null) return null;
+        return this.getCommands()[commandName] != false;
     }
 
     async update(){

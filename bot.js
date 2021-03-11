@@ -314,9 +314,9 @@ bot.on("message", async message => {
     if (!commandfile) return;
     if (cmd.replace(settings.prefix, "") == "setleague") return commandfile.run(bot, message, args, cmd);
     if (league == null) return new _NoticeEmbed(Colors.ERROR, "This guild does not have a guild set! Use the " + settings.prefix + "setleague command to set the league's guild").send(message.channel);
-    let user = new _User(message.author.id, league);
+    let user = await _User.getUser(message.author.id, league);
 
-    if (await user.hasPermission(commandfile) || await hasPermissionRoles(message, commandfile)) {
+    if (user.hasPermission(commandfile) || hasPermissionRoles(message, commandfile)) {
       let sett = require('./settings.json');
       if (settings.owners.includes(message.author.id) || sett.maintenance == false) {
         if (commandfile) {
@@ -386,8 +386,8 @@ async function hasPermissionRoles(message, prop) {
   let i = 0;
   while(i < roles.length){
     let val = roles[i];
-    let role = _Role.getRole(val.id, league);
-    let permission = await role.hasPermission(prop);
+    let role = await _Role.getRole(val.id, league);
+    let permission = role.hasPermission(prop);
     if (permission) {
       outcome = true;
       return;

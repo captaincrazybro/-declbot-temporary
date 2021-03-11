@@ -51,7 +51,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     var outcome = `<@${memOrRole.id}> is not allowed to use this command.`
 
-    let hasPermission = await type.hasPermission(commandfile);
+    let hasPermission = type.hasPermission(commandfile);
 
     if(hasPermission) outcome = `<@${memOrRole.id}> is allowed to use this command.`
 
