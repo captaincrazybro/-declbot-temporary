@@ -45,7 +45,9 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     var outcome = "";
 
-    let map = new Map(Object.entries(JSON.parse(obj.commands)));
+    let objCommands = await obj.getCommands();
+
+    let map = new Map(Object.entries(objCommands));
 
     map.forEach((v, k) => {
         outcome += `${k} - ${v}\n`

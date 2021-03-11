@@ -69,7 +69,7 @@ module.exports.run = async(bot,message,args,cmd) => {
 
     if(typeName == "role") name = name.replace("@", "@&");
 
-    let commands = type.getCommands();
+    let commands = await type.getCommands();
     commands[props.help.name] = boolean;
 
     type.commands = commands;

@@ -33,22 +33,24 @@ module.exports = class _User {
 
     }
 
-    getCommands(){
-        return JSON.parse(this.commands);
+    async getCommands(){
+        return JSON.parse(await this.commands);
     }
 
-    hasCommandPerm(commandName){
-        if(this.getCommands()[commandName] == undefined || this.getCommands()[commandName] == null) return null;
-        return this.getCommands()[commandName] != false;
+    async hasCommandPerm(commandName){
+        let commands = await this.getCommands();
+        if(commands[commandName] == undefined || commands[commandName] == null) return null;
+        return commands[commandName] != false;
     }
 
     async update(){
         await con.query(`UPDATE permissions SET thegroup = ${this.group}, commands = '${JSON.stringify(this.commands)}' WHERE id = "${this.id}"`);
     }
 
-    hasPermission(prop){
-        if(this.hasCommandPerm(prop.help.name) == false) return false;
-        return prop.help.permission <= this.group || this.hasCommandPerm(prop.help.name);
+    async hasPermission(prop){
+        let commandPerm = await this.hasCommandPerm(prop.help.name);
+        if(commandPerm == false) return false;
+        return prop.help.permission <= this.group || commandPerm;
     }
 
     static async getUser(id, league){
@@ -60,7 +62,7 @@ module.exports = class _User {
         if(rows.length == 0) {
             await con.query(`INSERT INTO permissions (id, type, thegroup, commands, league) VALUES ("${id}", "user", 0, '{}', "${league}")`);
             group = 0;
-            commands = {};
+            commands = "{}";
         } else {
             group = rows[0].thegroup;
             commands = rows[0].commands;
