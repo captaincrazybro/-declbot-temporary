@@ -382,7 +382,8 @@ async function hasPermissionRoles(message, prop) {
   let outcome = false;
   member.roles.forEach((val, i, map) => {
     let role = _Role.getRole(val.id, league);
-    if (await role.hasPermission(prop)) {
+    let permission = await role.hasPermission(prop);
+    if (permission) {
       outcome = true;
       return;
     }
