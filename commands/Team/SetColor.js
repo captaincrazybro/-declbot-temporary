@@ -3,6 +3,7 @@ const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed');
 const _Team  = require('../../util/Constructors/_Team')
 const Colors = require('../../util/Enums/Colors')
 const _League = require('../../util/Constructors/_League.js');
+const { Team } = require('discord.js');
 
 module.exports.run = async (bot,message,args,cmd) => {
 
@@ -15,7 +16,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let teamName = args[0];
 
-    let team = _Team.getTeam(teamName, league);
+    let team = await _Team.getTeam(teamName, league);
 
     if(team == null) return new _NoticeEmbed(Colors.ERROR, "Invalid name - This team does not exist").send(message.channel);
 
@@ -23,7 +24,8 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let color = args[1].toUpperCase();
 
-    team.setColor(color);
+    team.color = color;
+    await team.update();
 
     new _NoticeEmbed(Colors.SUCCESS, `Successfully set ${teamName}'s color to ${color}`).send(message.channel);
 

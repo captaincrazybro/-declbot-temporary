@@ -27,18 +27,14 @@ module.exports.run = async (bot, message, args, cmd) => {
 
         if (val == false || val == undefined) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-        let player = _Player.getPlayer(val.name, league); 
+        let player = await _Player.getPlayer(val.id, league); 
         
-        if (player == null) player = _Player.addPlayer(val.name, val.id, league); 
-        var ranks = `${player.rank}`
+        if (player == null) player = await _Player.addPlayer(val.id, league); 
+        var ranks = `${player.rank1}`
 
         if (player.rank2 != undefined) if (player.rank2.toLowerCase() != "none") ranks += ` and ${player.rank2}`
 
         //let blacklist = _Blacklist.getBlacklist(val.id);
-
-        if(player.discordId != null) {
-            let discordUser = await bot.users.fetch(player.discordId)
-        }
 
         let theLeagues = getLeagues(player.name);
 
@@ -48,9 +44,9 @@ module.exports.run = async (bot, message, args, cmd) => {
             .addField("Team", player.team)
             .addField("Rank", ranks)
             .addField("UUID", val.id)
-            if(player.discordId != null) embed.addField("Discord", discordUser.tag)
-            if(theLeagues.length != 0) embed.addField("Leagues", theLeagues.toString(", ").toUpperCase())
-            else embed.addField("Leagues", "None")
+            if(player.discordId != null && player.discordId != 0) embed.addField("Discord", `<@${player.discordId}>`)
+            //if(theLeagues.length != 0) embed.addField("Leagues", theLeagues.toString(", ").toUpperCase())
+            //else embed.addField("Leagues", "None")
             embed.setThumbnail(`http://minotar.net/helm/${val.name}/64.png`)
         /*if(player.rating["Rifle"] == null) embed.addField("Rifle Rating", "None");
         else embed.addField("Rifle Rating", player.rating["Rifle"])

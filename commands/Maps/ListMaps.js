@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../../storage/permissions.json');
+//const users = require('../../storage/permissions.json');
 const Groups = require('../../util/Enums/Groups.js');
 const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed.js')
 const Colors = require('../../util/Enums/Colors.js')

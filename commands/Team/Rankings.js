@@ -5,8 +5,24 @@ const Colors = require('../../util/Enums/Colors')
 const Discord = require('discord.js');
 const _MinecraftApi = require('../../util/Constructors/_MinecraftAPI')
 const ranks = require('../../storage/ranks.json')
-const teams = require('../../storage/teams.json')
+//const teams = require('../../storage/teams.json')
 const _League = require('../../util/Constructors/_League.js');
+const util = require('util')
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "oukS$aA7o22#I8drlThK",
+  database: "decl"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
+con.query = util.promisify(con.query);
 
 module.exports.run = async (bot, message, args, cmd) => {
 
@@ -47,11 +63,11 @@ module.exports.run = async (bot, message, args, cmd) => {
 
         var rankings = "";
 
-        let teamsSorted = _Team.getTeamObj(league).sort((a, b) => { return b.wins - a.wins })
+        let rows = await con.query(`SELECT * FROM teams WHERE league = "${league}" ORDER BY points DESC`)
 
-        teamsSorted.forEach(val => {
-            let index = teamsSorted.indexOf(val) + 1
-            rankings += `${index}. ${val.name} - Points: ${val.wins}\n`
+        rows.forEach(val => {
+            let index = rows.indexOf(val) + 1
+            rankings += `${index}. ${val.name} - Points: ${val.points}\n`
         })
 
         let embed = new Discord.MessageEmbed()

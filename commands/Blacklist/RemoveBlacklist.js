@@ -20,29 +20,31 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let name = args[0];
     
-    _MinecraftApi.getUuid(name).then(val => {
+    _MinecraftApi.getUuid(name).then(async val => {
         
         if(val == false) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
         
         if(val == undefined) return new _NoticeEmbed(Colors.ERROR, "Name update in progress.").send(message.channel);
 
-        let player = _Player.getPlayer(val.name);
+        let player = await _Player.getPlayer(val.id, league);
 
-        if(player == null) player = _Player.addPlayer(val.name);
+        if(player == null) player = await _Player.addPlayer(val.id, league);
     
-        let blacklist = _Blacklist.getBlacklist(val.id, league);
+        let blacklist = await _Blacklist.getBlacklist(val.id, league);
 
         if(args[2] && args[2].toLowerCase() == "-g"){
-            leagues.forEach(gL => {
-                let gBl = _Blacklist.getBlacklist(val.id, gL);
+            let i = 0;
+            while(i < leagues.length){
+                let gL = leagues[i]; 
+                let gBl = await _Blacklist.getBlacklist(val.id, gL);
                 gBl.delete();
-            })
+            }
             return new _NoticeEmbed(Colors.SUCCESS, "You have successfully globally deleted the blacklist for " + val.name).send(message.channel);
         }
     
         if(blacklist == null) return new _NoticeEmbed(Colors.ERROR, "This player is not blacklisted").send(message.channel);
     
-        blacklist.delete()
+        await blacklist.delete()
 		
 		return new _NoticeEmbed(Colors.SUCCESS, "You have successfully deleted the blacklist for " + val.name).send(message.channel);
         

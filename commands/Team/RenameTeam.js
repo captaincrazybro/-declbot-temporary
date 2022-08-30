@@ -15,7 +15,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let teamName = args[0];
 
-    let team = _Team.getTeam(teamName, league);
+    let team = await _Team.getTeam(teamName, league);
 
     if(team == null) return new _NoticeEmbed(Colors.ERROR, "This team does not exist").send(message.channel);
     
@@ -23,7 +23,8 @@ module.exports.run = async (bot,message,args,cmd) => {
     
     let newName = args[1];
 
-    team.setName(newName);
+    team.name = newName;
+    await team.update();
 
     new _NoticeEmbed(Colors.SUCCESS, `Successfully renamed team ${teamName} to ${newName}`).send(message.channel);
 

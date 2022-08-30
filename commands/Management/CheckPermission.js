@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../../storage/permissions.json');
+//const users = require('../../storage/permissions.json');
 const Groups = require('../../util/Enums/Groups.js');
 const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed.js')
 const Colors = require('../../util/Enums/Colors.js')
@@ -33,10 +33,10 @@ module.exports.run = async (bot,message,args,cmd) => {
     var name;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
     }
 
@@ -51,7 +51,9 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     var outcome = `<@${memOrRole.id}> is not allowed to use this command.`
 
-    if(type.hasPermission(commandfile)) outcome = `<@${memOrRole.id}> is allowed to use this command.`
+    let hasPermission = type.hasPermission(commandfile);
+
+    if(hasPermission) outcome = `<@${memOrRole.id}> is allowed to use this command.`
 
     if(typeName == "role") outcome = outcome.replace("@", "@&")
 

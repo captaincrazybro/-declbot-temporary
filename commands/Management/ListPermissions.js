@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../../storage/permissions.json');
+//const users = require('../../storage/permissions.json');
 const Groups = require('../../util/Enums/Groups.js');
 const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed.js')
 const Colors = require('../../util/Enums/Colors.js')
@@ -34,19 +34,18 @@ module.exports.run = async (bot,message,args,cmd) => {
     var obj;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
-        obj = _User.users(league).users[memOrRole.id];
+        obj = type;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
-        let role = new _Role(memOrRole.id);
-        obj = _User.users(league).roles[memOrRole.id];
+        obj = type;
     }
 
     var outcome = "";
 
-    let map = new Map(Object.entries(obj.commands));
+    let map = new Map(Object.entries(obj.getCommands()));
 
     map.forEach((v, k) => {
         outcome += `${k} - ${v}\n`

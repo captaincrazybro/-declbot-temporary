@@ -24,13 +24,14 @@ module.exports.run = async (bot, message, args, cmd) => {
 
         if (val == false || val == undefined) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-        let player = _Player.getPlayer(val.name, league);
+        let player = await _Player.getPlayer(val.id, league);
 
         if (args.length == 1) return new _NoticeEmbed(Colors.WARN, "Please specify a discord user (id or mention)").send(message.channel);
 
         let user = message.mentions.users.first() || await bot.users.fetch(args[1])
 
-        player.setDiscordId(user.id);
+        player.discordId = user.id;
+        await player.update();
 
         let embed = new Discord.MessageEmbed()
             .setColor(Colors.SUCCESS)

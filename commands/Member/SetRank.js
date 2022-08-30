@@ -20,14 +20,16 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let promise = _MinecraftApi.getUuid(playerName)
 
-    promise.then(val => {
+    promise.then(async val => {
 
-        if(val == false || !_Player.getPlayer(playerName, league)) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
+        if(val == false) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
             
-        let player = _Player.getPlayer(val.name, league);
+        let player = await _Player.getPlayer(val.id, league);
+
+        if(!player)  return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
         if(player == null) {
-            player = _Player.addPlayer(val.name, val.id, league);
+            player = await _Player.addPlayer(val.id, league);
         }
     
         if(args.length == 1) return new _NoticeEmbed(Colors.WARN, "Please specify a rank").send(message.channel);
@@ -36,7 +38,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
         if(getRankOrNull(rank) == null) return new _NoticeEmbed(Colors.ERROR, "Invalid rank - This rank does not exist").send(message.channel);
 
-        player.setRank(capitalize(rank.toLowerCase()), league);
+        player.rank1 = capitalize(rank.toLowerCase());
 
         var rank2 = null;
 
@@ -48,9 +50,11 @@ module.exports.run = async (bot,message,args,cmd) => {
             else if(getRankOrNull(rank2) == null) return new _NoticeEmbed(Colors.ERROR, "Invalid second rank - This rank does not exist").send(message.channel);
             else rank2 = capitalize(rank2.toLowerCase());
 
-            player.setRank2(rank2);
+            player.rank2 = rank2;
 
         }
+
+        await player.update();
 
         if(rank2 != null) new _NoticeEmbed(Colors.SUCCESS, `Successfully set ${val.name}'s rank to ${capitalize(rank.toLowerCase())} and second rank to ${rank2}`).send(message.channel);
         else new _NoticeEmbed(Colors.SUCCESS, `Successfully set ${val.name}'s rank to ${capitalize(rank.toLowerCase())}`).send(message.channel);

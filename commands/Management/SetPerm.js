@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../../storage/permissions.json');
+//const users = require('../../storage/permissions.json');
 const Groups = require('../../util/Enums/Groups.js');
 const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed.js')
 const Colors = require('../../util/Enums/Colors.js')
@@ -7,6 +7,7 @@ const _User = require('../../util/Constructors/_User')
 const _Role = require('../../util/Constructors/_Role.js')
 const Discord = require('discord.js');
 const _League = require('../../util/Constructors/_League');
+const { commands } = require('../../bot');
 
 module.exports.run = async(bot,message,args,cmd) => {
 
@@ -43,10 +44,10 @@ module.exports.run = async(bot,message,args,cmd) => {
     var name;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
     }
 
@@ -68,7 +69,11 @@ module.exports.run = async(bot,message,args,cmd) => {
 
     if(typeName == "role") name = name.replace("@", "@&");
 
-    type.setCommandPerm(props.help.name, boolean);
+    let commands = type.getCommands();
+    commands[props.help.name] = boolean;
+
+    type.commands = commands;
+    await type.update();
 
     let embed = new Discord.MessageEmbed()
         .setColor(Colors.SUCCESS)

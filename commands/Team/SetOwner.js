@@ -17,7 +17,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let teamName = args[0];
 
-    let team = _Team.getTeam(teamName, league)
+    let team = await _Team.getTeam(teamName, league)
 
     if(team == null) return new _NoticeEmbed(Colors.ERROR, "Invalid team - This team does not exist").send(message.channel);
 
@@ -27,13 +27,14 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     let promise = _MinecraftApi.getUuid(playerName)
 
-    promise.then(val => {
+    promise.then(async val => {
 
         if(val == false) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
         //if(_Player.getPlayer(playerName) && _Player.getPlayer(playerName).team != team.name) return new _NoticeEmbed(Colors.ERROR, "This player is not on this team");
 
-        team.setOwner(val.id);
+        team.owner = val.id;
+        await team.update();
 
         new _NoticeEmbed(Colors.SUCCESS, `Successfully set ${team.name}'s owner to ${val.name}`).send(message.channel);
 

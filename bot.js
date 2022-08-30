@@ -19,6 +19,22 @@ const Groups = require('./util/Enums/Groups');
 const _League = require('./util/Constructors/_League');
 const { MessageEmbed } = require('discord.js');
 const EmbedWizard = require('./modules/EmbedWizard.js');
+const util = require('util')
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "oukS$aA7o22#I8drlThK",
+  database: "decl"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
+con.query = util.promisify(con.query);
 
 require("dotenv").config();
 
@@ -87,7 +103,7 @@ bot.on('error', e => {
   console.log(e)
 })
 
-const players = require('./storage/players.json');
+/*const players = require('./storage/players.json');
 const teams = require('./storage/teams.json');
 const permissions = require('./storage/permissions.json');
 
@@ -110,9 +126,10 @@ fs.writeFile('./storage/teams.json', JSON.stringify(teams), (err) => {
 })
 fs.writeFile('./storage/permissions.json', JSON.stringify(permissions), (err) => {
   if (err) console.log(err);
-})
+})*/
 
 bot.on("ready", async () => {
+
   console.log(`${bot.user.username} is online!`);
   //bot.user.setPresence({ game: { name: "Mineplex" } });
   bot.user.setPresence({
@@ -158,6 +175,11 @@ function showLeague(i) {
     showLeague(i);
   }, 10000)
 }
+
+// make it stay with decl 
+bot.on("guildCreate", guild => {
+  _League.setLeague(guild.id, "decl");
+})
 
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (this.rankedReactionsMap.has(reaction.message.id)) {
@@ -231,14 +253,13 @@ bot.on("messageReactionAdd", async (reaction, user) => {
   }
 });
 
-setInterval(function () {
+/*setInterval(function () {
   let i = 0;
   while (i < leagues.length) {
     _Player.updateNames(leagues[i]);
     i++;
   }
-}, ms("12h"));
-//_Player.updateNames()
+}, ms("12h"));*/
 
 /*add daily backups
 let players = require("../../storage/players.json");
@@ -298,8 +319,9 @@ bot.on("message", async message => {
     if (!commandfile) return;
     if (cmd.replace(settings.prefix, "") == "setleague") return commandfile.run(bot, message, args, cmd);
     if (league == null) return new _NoticeEmbed(Colors.ERROR, "This guild does not have a guild set! Use the " + settings.prefix + "setleague command to set the league's guild").send(message.channel);
-    let user = new _User(message.author.id, league);
-    if (settings.owners.includes(message.author.id) || user.hasPermission(commandfile) || hasPermissionRoles(message, commandfile)) {
+    let user = await _User.getUser(message.author.id, league);
+
+    if (user.hasPermission(commandfile) || hasPermissionRoles(message, commandfile)) {
       let sett = require('./settings.json');
       if (settings.owners.includes(message.author.id) || sett.maintenance == false) {
         if (commandfile) {
@@ -357,19 +379,26 @@ bot.on("messageDelete", (message) => {
   //bot.guilds.get('692395141427757067').channels.get('692801275280228382').send(embed);
 });*/
 
-function hasPermissionRoles(message, prop) {
+async function hasPermissionRoles(message, prop) {
 
   let league = _League.getLeague(message.guild.id);
 
   let member = message.guild.members.cache.get(message.author.id);
   let outcome = false;
-  member.roles.forEach((val, i, map) => {
-    let role = new _Role(val.id, league);
-    if (role.hasPermission(prop)) {
+
+  let roles = member.roles;
+
+  let i = 0;
+  while(i < roles.length){
+    let val = roles[i];
+    let role = await _Role.getRole(val.id, league);
+    let permission = role.hasPermission(prop);
+    if (permission) {
       outcome = true;
       return;
     }
-  })
+    i++;
+  }
   return outcome;
 }
 
@@ -651,7 +680,7 @@ function doMatchOutcome(message) {
 
 }
 
-function doBlAdd(message) {
+async function doBlAdd(message) {
 
   if (module.exports.blAddMap.has(message.author.id)) {
 
@@ -671,19 +700,20 @@ function doBlAdd(message) {
 
           if (val == false) return new _NoticeEmbed(Colors.ERROR, "Invalid Player - This player does not exist").send(message.channel);
 
-          let player = _Player.getPlayer(message.content, module.exports.blAddMap.get(message.author.id).league);
-          if (!player) player = _Player.addPlayer(val.name, val.id, module.exports.blAddMap.get(message.author.id).league);
+          let name = message.content;
+          //let player = await _Player.getPlayer(message.content, module.exports.blAddMap.get(message.author.id).league);
+          //if (!player) player = await _Player.addPlayer(val.name, val.id, module.exports.blAddMap.get(message.author.id).league);
 
           //if(player.rank.toLowerCase() != "referee")
 
           let newObj = module.exports.blAddMap.get(message.author.id)
 
-          newObj.referee = player.name;
+          newObj.referee = name
           newObj.step = 1;
 
           module.exports.blAddMap.set(message.author.id, newObj);
 
-          return new _NoticeEmbed(Colors.SUCCESS, "The referee for this blacklist has been set to " + player.name + ". Please enter the start date of the blacklist (MM/DD/YYYY).").send(message.channel);
+          return new _NoticeEmbed(Colors.SUCCESS, "The referee for this blacklist has been set to " + name + ". Please enter the start date of the blacklist (MM/DD/YYYY).").send(message.channel);
 
         })
       }
@@ -791,12 +821,14 @@ function doBlAdd(message) {
         newObj.step = 6;
 
         if (newObj.isGlobal) {
-          leagues.forEach(val => {
-            _Blacklist.createBlacklist(newObj, val);
-          })
+          
+          for(let i = 0; i < leagues.length; i++){
+            let val = leagues[i];
+            await _Blacklist.createBlacklist(newObj, val);
+          }
         }
         else {
-          _Blacklist.createBlacklist(newObj, newObj.league);
+          await _Blacklist.createBlacklist(newObj, newObj.league);
         }
 
         module.exports.blAddMap.set(message.author.id, newObj);

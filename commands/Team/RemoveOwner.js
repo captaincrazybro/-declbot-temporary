@@ -19,7 +19,8 @@ module.exports.run = async (bot,message,args,cmd) => {
 
     if(team == null) return new _NoticeEmbed(Colors.ERROR, "Invalid name - This team does not exist").send(message.channel);
 
-    team.setOwner("None");
+    team.owner = "None";
+    await team.update();
 
     new _NoticeEmbed(Colors.SUCCESS, `Successfully removed ${teamName}'s owner`).send(message.channel);
 

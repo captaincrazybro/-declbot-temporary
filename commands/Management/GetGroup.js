@@ -1,5 +1,5 @@
 const fs = require('fs');
-const users = require('../../storage/permissions.json');
+//const users = require('../../storage/permissions.json');
 const Groups = require('../../util/Enums/Groups.js');
 const _NoticeEmbed = require('../../util/Constructors/_NoticeEmbed.js')
 const Colors = require('../../util/Enums/Colors.js')
@@ -35,22 +35,22 @@ module.exports.run = async (bot,message,args,cmd) => {
     var name;
 
     if(typeName == "user"){
-        type = new _User(memOrRole.id, league);
+        type = await _User.getUser(memOrRole.id, league);
         name = memOrRole.username;
     } else {
-        type = new _Role(memOrRole.id, league);
+        type = await _Role.getRole(memOrRole.id, league);
         name = memOrRole.name;
     }
 
     var group;
 
-    if(type.getGroup == 0){
+    if(type.group == 0){
         group = "Default";
-    } else if(type.getGroup == 1){
+    } else if(type.group == 1){
         group = "Mod";
-    } else if(type.getGroup == 2){
+    } else if(type.group == 2){
         group = "Admin";
-    } else if(type.getGroup == 3){
+    } else if(type.group == 3){
         group = "Manager";
     } else {
         group = "Owner"
@@ -73,8 +73,7 @@ module.exports.run = async (bot,message,args,cmd) => {
 }
 
 function userExists(id, league){
-    let users = _User.users(league);
-    return users[league].users[id];
+    return _User.exists(id, league);
 }
 
 module.exports.help = {
